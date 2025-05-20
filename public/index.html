@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>League of Legends - Busca de Invocador</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Beaufort+for+LOL:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="summonerName" placeholder="Nome do Invocador">#
+                <input type="text" id="summonerTag" placeholder="Tag">
+                <button onclick="buscarInvocador()">Buscar</button>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <div id="result" class="hidden">
+            <div class="profile-container">
+                <img id="profileIcon" class="profile-icon" src="" alt="Ícone do Perfil">
+                <div class="profile-info">
+                    <h2 id="summonerNameDisplay" class="summoner-name"></h2>
+                    <div class="level-badge">
+                        Nível <span id="levelNumber"></span>
+                    </div>
+                    <div id="rankInfo" class="rank-info"></div>
+                    <div class="winrate-container">
+                        <div id="winrateInfo"></div>
+                        <div id="winrateProgress" class="winrate-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="champion-mastery" id="championMastery">
+                <!-- Cards de maestria serão inseridos aqui -->
+            </div>
+
+            <div class="match-history" id="matchHistory">
+                <!-- Histórico de partidas será inserido aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
