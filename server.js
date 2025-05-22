@@ -1,10 +1,16 @@
 const express = require('express');
 const axios = require('axios');
 require('dotenv').config();
-const lolRoutes = require('./routes/lol');
+const lolRoutes = require('./routes/lol.js');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const port = 3000;
+
+// Configuração do Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Log para debug da chave da API
 console.log('Chave da API:', process.env.RIOT_API_KEY ? 'Presente' : 'Ausente');
@@ -243,6 +249,75 @@ app.get('/api/match-history/:puuid', async (req, res) => {
         res.status(error.response?.status || 500).json({
             error: error.response?.data?.status?.message || 'Erro interno do servidor'
         });
+    }
+});
+
+// Rota para adicionar jogador ao ranking
+app.post('/api/ranking/add', async (req, res) => {
+    try {
+        const { summonerName, tier, rank, lp, tierValue, profileIconId } = req.body;
+
+        // Verificar se o jogador já existe
+        const { data: existingPlayer } = await supabase
+            .from('ranked_players')
+            .select()
+            .eq('summoner_name', summonerName)
+            .single();
+
+        if (existingPlayer) {
+            // Atualizar dados do jogador existente
+            const { error } = await supabase
+                .from('ranked_players')
+                .update({
+                    tier,
+                    rank,
+                    lp,
+                    tier_value: tierValue,
+                    profile_icon_id: profileIconId,
+                    created_at: new Date().toISOString()
+                })
+                .eq('summoner_name', summonerName);
+
+            if (error) throw error;
+        } else {
+            // Adicionar novo jogador
+            const { error } = await supabase
+                .from('ranked_players')
+                .insert([{
+                    summoner_name: summonerName,
+                    tier,
+                    rank,
+                    lp,
+                    tier_value: tierValue,
+                    profile_icon_id: profileIconId,
+                    created_at: new Date().toISOString()
+                }]);
+
+            if (error) throw error;
+        }
+
+        res.json({ message: 'Jogador adicionado/atualizado com sucesso' });
+    } catch (error) {
+        console.error('Erro ao adicionar ao ranking:', error);
+        res.status(500).json({ error: 'Erro ao adicionar ao ranking' });
+    }
+});
+
+// Rota para obter o ranking
+app.get('/api/ranking', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('ranked_players')
+            .select('*')
+            .order('tier_value', { ascending: false })
+            .order('lp', { ascending: false });
+
+        if (error) throw error;
+
+        res.json(data);
+    } catch (error) {
+        console.error('Erro ao buscar ranking:', error);
+        res.status(500).json({ error: 'Erro ao buscar ranking' });
     }
 });
 

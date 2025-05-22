@@ -215,6 +215,66 @@ async function buscarInvocador() {
     }
 }
 
+function calcularTierValue(tier, rank) {
+    // Ordem dos tiers do LoL
+    const tierOrder = [
+        'IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'EMERALD', 'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER'
+    ];
+    const rankOrder = ['IV', 'III', 'II', 'I'];
+    const tierIndex = tierOrder.indexOf(tier.toUpperCase());
+    const rankIndex = rankOrder.indexOf(rank.toUpperCase());
+    if (tierIndex === -1 || rankIndex === -1) return 0;
+    return tierIndex * 4 + rankIndex;
+}
+
+async function adicionarAoRanking() {
+    // Extrair informações do perfil exibido
+    const summonerNameDisplay = document.getElementById('summonerNameDisplay').textContent;
+    const summonerName = summonerNameDisplay.split('#')[0];
+    const profileIconUrl = document.getElementById('profileIcon').src;
+    const profileIconId = parseInt(profileIconUrl.match(/\/([0-9]+)\.png/)[1]);
+    const rankInfo = document.getElementById('rankInfo').textContent;
+
+    // Extrair tier, rank e lp do texto do rankInfo
+    let tier = '', rank = '', lp = 0;
+    if (rankInfo && rankInfo !== 'Não ranqueado') {
+        const match = rankInfo.match(/([A-Za-zçÇ]+) ([IV]+) (\d+) LP/);
+        if (match) {
+            tier = match[1].toUpperCase();
+            rank = match[2];
+            lp = parseInt(match[3]);
+        }
+    } else {
+        alert('Invocador não ranqueado. Não é possível adicionar ao ranking.');
+        return;
+    }
+    const tierValue = calcularTierValue(tier, rank);
+
+    try {
+        const response = await fetch('/api/ranking/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                summonerName,
+                tier,
+                rank,
+                lp,
+                tierValue,
+                profileIconId
+            })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            alert('Invocador adicionado ao ranking com sucesso!');
+        } else {
+            throw new Error(data.error || 'Erro ao adicionar ao ranking');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar ao ranking:', error);
+        alert(error.message || 'Erro ao adicionar ao ranking. Por favor, tente novamente.');
+    }
+}
+
 // Carregar dados dos campeões quando a página carregar
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM carregado');

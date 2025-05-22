@@ -11,11 +11,14 @@
 
 <body>
     <div class="container">
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="summonerName" placeholder="Nome do Invocador">#
-                <input type="text" id="summonerTag" placeholder="Tag">
-                <button onclick="buscarInvocador()">Buscar</button>
+        <a href="ranking.html" class="ranking-button">Ver Ranking</a>
+        <div class="header">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="summonerName" placeholder="Nome do Invocador">#
+                    <input type="text" id="summonerTag" placeholder="Tag">
+                    <button onclick="buscarInvocador()">Buscar</button>
+                </div>
             </div>
         </div>
 
@@ -35,6 +38,10 @@
                     <div class="winrate-container">
                         <div id="winrateInfo"></div>
                         <div id="winrateProgress" class="winrate-bar"></div>
+                    </div>
+                    <div class="profile-actions">
+                        <button id="addToRankingBtn" onclick="adicionarAoRanking()" class="action-button">Adicionar ao
+                            Ranking</button>
                     </div>
                 </div>
             </div>
